@@ -37,20 +37,39 @@
 
 ## 빌드 및 실행 방법
 
+## 테이블 스키마
+![Alt text](https://github.com/Khafre-SungMin-Cho/housing-finance/blob/master/Untitled%20Diagram.png)
+
+### Institute (기관)
+
+
+
+### 
+
 ## API 명세서
 ### POST /upload
 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API
 
-### GET /list/bank
+- Request
+  - 없음
+
+- Response
+
+응답 예시
+<code> true </code>
+  
+- Response Code
+
+### GET /banks
 주택금융 공급 금융기관(은행) 목록을 출력하는 API
 
-### GET /list/year/{bank_code}
+### GET /year/{bank_code}
 년도별 각 금융기관의 지원금액 합계를 출력하는 API
 
-### GET /get/largest/{year}
+### GET /largest/{year}
 각 년도별 각 기관의 전체 지원금액 중에서 가장 큰 금액의 기관명을 출력하는 API
 
-### GET /get/summary/{bank_code}
+### GET /summary/{bank_code}
 전체 년도(2005~2016)에서 외환은행의 지원금액 평균 중에서 가장 작은 금액과 큰 금액을 출력하는 API
 
 ## 선택 문제 API 명세
@@ -63,8 +82,14 @@
 - [X] 테이블 스키마 설계
 - [ ] API 명세서 작성
 - [X] REST API 프로젝트 템플릿 만들기
-- [ ] H2 Database + Hibernate 연동
+- [X] H2 Database + Hibernate 연동
 - [X] 데이터 읽어오기
+- [X] Identifier generator 생성 및 적용
+- [ ] 주택금융 공급 금융기관(은행) 목록을 출력하는 API
+- [ ] 년도별 각 금융기관의 지원금액 합계를 출력하는 API
+- [ ] 각 년도별 각 기관의 전체 지원금액 중에서 가장 큰 금액의 기관명을 출력하는 API
+- [ ] 전체 년도에서 외환은행의 지원금액 평균 중에서 가장 작은 금액과 큰 금액을 출력하는 API
+- [ ] 예외 처리
 
 ## OPTION
 - [ ] 추가 제약 사항

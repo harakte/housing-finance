@@ -1,1 +1,15 @@
-
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: kakaopay
+    password: kakaopay
+  jpa:
+    database: h2
+  h2:
+    console:
+      enabled: true
+      path: /testdb
+csv:
+  file:
+    path: csv/input.csv

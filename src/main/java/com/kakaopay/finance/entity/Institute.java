@@ -1,20 +1,23 @@
 package com.kakaopay.finance.entity;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
-@Data
+
 @Entity
+@Setter
+@Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Institute {
 
     @Id
@@ -22,8 +25,22 @@ public class Institute {
     @GenericGenerator(name = "bnk-generator",
             parameters = @Parameter(name = "prefix", value = "bnk"),
             strategy = "com.kakaopay.finance.config.StringIdentifierGenerator")
-    private String institueCode;
+    private String instituteCode;
 
     @NotNull
-    private String institueName;
+    private String instituteName;
+
+    @OneToMany(mappedBy = "institute", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Finance> finances;
+
+    public Institute(String instituteName) {
+        this.instituteName = instituteName;
+    }
+
+    public void addFinance(Finance finance){
+        if(finances == null){
+            finances = new HashSet<Finance>();
+        }
+        finances.add(finance);
+    }
 }

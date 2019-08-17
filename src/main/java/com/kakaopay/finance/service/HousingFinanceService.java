@@ -6,6 +6,5 @@ import java.util.List;
 
 public interface HousingFinanceService {
     public boolean upload();
-
     public List<Institute> findAll();
 }

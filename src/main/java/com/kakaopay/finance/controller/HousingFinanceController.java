@@ -1,14 +1,12 @@
 package com.kakaopay.finance.controller;
 
 import com.kakaopay.finance.dto.AnnualInstituteFinance;
+import com.kakaopay.finance.dto.InstituteSupportFinance;
 import com.kakaopay.finance.dto.YearFinance;
 import com.kakaopay.finance.entity.Institute;
 import com.kakaopay.finance.service.HousingFinanceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,6 +34,11 @@ public class HousingFinanceController {
     @GetMapping("/largest")
     public AnnualInstituteFinance getLargestYear(){
         return service.getLargestAnnualFinance();
+    }
+
+    @GetMapping("/summary/{instituteCode}")
+    public InstituteSupportFinance getInstituteSummary(@PathVariable String instituteCode){
+        return service.getInstituteSummary(instituteCode);
     }
 
 }

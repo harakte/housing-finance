@@ -1,6 +1,7 @@
 package com.kakaopay.finance.service;
 
 import com.kakaopay.finance.dto.AnnualInstituteFinance;
+import com.kakaopay.finance.dto.InstituteSupportFinance;
 import com.kakaopay.finance.dto.YearFinance;
 import com.kakaopay.finance.entity.Institute;
 
@@ -11,4 +12,5 @@ public interface HousingFinanceService {
     List<Institute> findAll();
     List<YearFinance> getYearFinances();
     AnnualInstituteFinance getLargestAnnualFinance();
+    InstituteSupportFinance getInstituteSummary(String instituteCode);
 }

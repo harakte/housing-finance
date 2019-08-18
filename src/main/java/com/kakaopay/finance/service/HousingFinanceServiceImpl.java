@@ -2,7 +2,9 @@ package com.kakaopay.finance.service;
 
 import com.kakaopay.finance.dao.FinanceRepository;
 import com.kakaopay.finance.dao.InstituteRepository;
+import com.kakaopay.finance.dto.AnnualAverageAmount;
 import com.kakaopay.finance.dto.AnnualInstituteFinance;
+import com.kakaopay.finance.dto.InstituteSupportFinance;
 import com.kakaopay.finance.dto.YearFinance;
 import com.kakaopay.finance.entity.Finance;
 import com.kakaopay.finance.entity.Institute;
@@ -122,4 +124,43 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
                         largest.getValue().getValue()))
                 .orElseThrow(NoSuchElementException::new);
     }
+
+    @Override
+    public InstituteSupportFinance getInstituteSummary(String instituteCode) {
+        /*
+        1. id인 instituteCode로 institute 조회
+        2. Map<Integer,Integer> 형태로 은행의 년도별 평균 금액: Map<year, amount>
+        3. 은행의 년도별 평균 금액 중 최대값을 AnnualAverageAmount class로 변환하여 list에 추가
+        4. 은행의 년도별 평균 금액 중 최소값을 AnnualAverageAmount class로 변환하여 list에 추가
+        5. InstituteSupportFinance class 형태로 리턴
+        */
+        Institute institute = instituteRepository.findById(instituteCode).orElseThrow(NoSuchElementException::new);
+
+        Map<Integer, Integer> instituteAverageFinance =
+                institute.getFinances().stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        Finance::getYear,
+                                        Collectors.averagingInt(Finance::getAmount)))
+                        .entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> (int)Math.ceil(e.getValue())));
+
+        List<AnnualAverageAmount> supportAmount = new ArrayList<>();
+
+        supportAmount.add(
+                instituteAverageFinance.entrySet().stream()
+                        .max(Comparator.comparing(Map.Entry::getValue))
+                        .map(e -> new AnnualAverageAmount(e.getKey(), e.getValue()))
+                        .orElseThrow(NoSuchElementException::new));
+
+        supportAmount.add(
+                instituteAverageFinance.entrySet().stream()
+                        .min(Comparator.comparing(Map.Entry::getValue))
+                        .map(e -> new AnnualAverageAmount(e.getKey(), e.getValue()))
+                        .orElseThrow(NoSuchElementException::new));
+
+        return new InstituteSupportFinance(institute.getInstituteName(), supportAmount);
+    }
+
+
 }

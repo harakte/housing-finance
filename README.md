@@ -56,21 +56,122 @@
 - Response
 
 응답 예시
-<code> true </code>
+<pre><code>{
+  "errorCode": 0,
+  "errorMessage": "success"
+}
+</code></pre>
   
 - Response Code
 
 ### GET /banks
 주택금융 공급 금융기관(은행) 목록을 출력하는 API
 
-### GET /year/{bank_code}
+- Request
+  - 없음
+
+- Response
+
+응답 예시
+<pre><code>[
+    {
+        "instituteCode": "bnk-1",
+        "instituteName": "주택도시기금1"
+    },
+    {
+        "instituteCode": "bnk-2",
+        "instituteName": "국민은행"
+    },
+    ...
+]
+</code></pre>
+
+  
+- Response Code
+
+### GET /years
 년도별 각 금융기관의 지원금액 합계를 출력하는 API
 
-### GET /largest/{year}
+- Request
+  - 없음
+
+- Response
+
+응답 예시
+<pre><code>[
+  {
+      "year": 2016,
+      "totalAmount": 400971,
+      "detailAmount": {
+          "농협은행/수협은행": 23913,
+          "하나은행": 45485,
+          "우리은행": 45461,
+          "국민은행": 61380,
+          "신한은행": 36767,
+          "외환은행": 5977,
+          "주택도시기금1": 91017,
+          "기타은행": 90925,
+          "한국시티은행": 46
+      }
+  },
+  {
+      "year": 2017,
+      "totalAmount": 295126,
+      "detailAmount": {
+          "농협은행/수협은행": 26969,
+          "하나은행": 35629,
+          "우리은행": 38846,
+          "국민은행": 31480,
+          "신한은행": 40729,
+          "외환은행": 0,
+          "주택도시기금1": 85409,
+          "기타은행": 36057,
+          "한국시티은행": 7
+      }
+  },
+  ...
+]
+</code></pre>
+  
+- Response Code
+
+### GET /largest
 각 년도별 각 기관의 전체 지원금액 중에서 가장 큰 금액의 기관명을 출력하는 API
+
+- Request
+  - 없음
+
+- Response
+
+응답 예시
+<pre><code>{
+  "instituteName": "주택도시기금1",
+  "year": 2014
+} 
+</code></pre>
+  
+- Response Code
 
 ### GET /summary/{bank_code}
 전체 년도(2005~2016)에서 외환은행의 지원금액 평균 중에서 가장 작은 금액과 큰 금액을 출력하는 API
+
+- Request
+  - bank: institute code, string, 뱅크 코드
+
+- Response
+
+응답 예시
+<pre><code>{
+  "instituteName": "주택도시기금",
+  "supportAmount":[
+    {"year":2008,"amount":78},
+    {"year":2015,"amount":1702}
+  ]
+} 
+</code></pre>
+  
+- Response Code
+
 
 ## 선택 문제 API 명세
 ### 예측 API
@@ -81,6 +182,10 @@
 - [X] README 정리
 - [X] 테이블 스키마 설계
 - [ ] API 명세서 작성
+  - [ ] request 작성
+  - [ ] response 작성
+  - [ ] response 예시
+  - [ ] result code 작성
 - [X] REST API 프로젝트 템플릿 만들기
 - [X] H2 Database + Hibernate 연동
 - [X] 데이터 읽어오기

@@ -1,5 +1,6 @@
 package com.kakaopay.finance.controller;
 
+import com.kakaopay.finance.dto.YearFinance;
 import com.kakaopay.finance.entity.Institute;
 import com.kakaopay.finance.service.HousingFinanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,4 +28,8 @@ public class HousingFinanceController {
         return service.findAll();
     }
 
+    @GetMapping("/years")
+    public List<YearFinance> getYearFinances(){
+        return service.getYearFinances();
+    }
 }

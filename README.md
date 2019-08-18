@@ -34,17 +34,32 @@
 - Dependency
 
 ## 문제해결 전략
+- Entity 관계
+  - 양방향 OneToMany 관계로 개발
+  - 요구사항에 따라 기관을 기준 또는 금융데이터를 기준으로 처리하기 위해서 서로 연관
+- 각 년도별 은행별 금액 계산
+  - 금융데이터를 기준으로 년도로 그룹핑
+  - 년도별로 그룹핑된 금액을 합쳐서 년도 금액 총액을 계산
+- 각 년도별 각 기관의 가장 큰 금액 찾기
+  - 기관을 기준으로 기관의 년도별 금액을 계산
+  - 기관 내에서 가장 큰 년도 금액 찾기
+  - 기관별 가장 큰 년도 금액에서 가장 큰 금액 
 
 ## 빌드 및 실행 방법
+
 
 ## 테이블 스키마
 ![Alt text](https://github.com/Khafre-SungMin-Cho/housing-finance/blob/master/Untitled%20Diagram.png)
 
 ### Institute (기관)
+- institute_code: varchar
+- institute_name: nvarchar
 
-
-
-### 
+### Finance (금융 데이터)
+- institute_code: varchar
+- year: int
+- month: int
+- amount: int
 
 ## API 명세서
 ### POST /upload
@@ -152,11 +167,11 @@
   
 - Response Code
 
-### GET /summary/{bank_code}
+### GET /summary/{bankCode}
 전체 년도(2005~2016)에서 외환은행의 지원금액 평균 중에서 가장 작은 금액과 큰 금액을 출력하는 API
 
 - Request
-  - bank: institute code, string, 뱅크 코드
+  - bankCode: institute code, string, 외환은행 기관코드 입력(bnk-8)
 
 - Response
 
@@ -182,19 +197,36 @@
 - [X] README 정리
 - [X] 테이블 스키마 설계
 - [ ] API 명세서 작성
-  - [ ] request 작성
+  - [X] request 작성
   - [ ] response 작성
-  - [ ] response 예시
-  - [ ] result code 작성
+  - [X] response 예시
+  - [ ] response code 작성
 - [X] REST API 프로젝트 템플릿 만들기
-- [X] H2 Database + Hibernate 연동
+- [ ] H2 Database + Hibernate 연동
+  - [X] H2 Database 연동
+  - [ ] H2 Database 설정 작업
+  - [X] Hibernate 연동
+  - [X] Entity 구성
 - [X] 데이터 읽어오기
 - [X] Identifier generator 생성 및 적용
+- [ ] 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API
+  - [X] Happy case만 고려된 동작 개발
+  - [ ] 예외처리 작업
 - [ ] 주택금융 공급 금융기관(은행) 목록을 출력하는 API
+  - [X] Happy case만 고려된 동작 개발
+  - [ ] 예외처리 작업 
 - [ ] 년도별 각 금융기관의 지원금액 합계를 출력하는 API
+  - [X] Happy case만 고려된 동작 개발
+  - [ ] 예외처리 작업
 - [ ] 각 년도별 각 기관의 전체 지원금액 중에서 가장 큰 금액의 기관명을 출력하는 API
+  - [X] Happy case만 고려된 동작 개발
+  - [ ] 예외처리 
 - [ ] 전체 년도에서 외환은행의 지원금액 평균 중에서 가장 작은 금액과 큰 금액을 출력하는 API
-- [ ] 예외 처리
+  - [X] Happy case만 고려된 동작 개발
+  - [ ] 예외처리 
+- [ ] 응답 처리
+  - [ ] 결과 응답 처리
+  - [ ] 예외 응답 처리
 
 ## OPTION
 - [ ] 추가 제약 사항

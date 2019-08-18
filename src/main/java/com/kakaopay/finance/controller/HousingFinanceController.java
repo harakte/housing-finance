@@ -1,5 +1,6 @@
 package com.kakaopay.finance.controller;
 
+import com.kakaopay.finance.dto.AnnualInstituteFinance;
 import com.kakaopay.finance.dto.YearFinance;
 import com.kakaopay.finance.entity.Institute;
 import com.kakaopay.finance.service.HousingFinanceService;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/finance")
 public class HousingFinanceController {
 
     @Autowired
@@ -32,4 +32,10 @@ public class HousingFinanceController {
     public List<YearFinance> getYearFinances(){
         return service.getYearFinances();
     }
+
+    @GetMapping("/largest")
+    public AnnualInstituteFinance getLargestYear(){
+        return service.getLargestAnnualFinance();
+    }
+
 }

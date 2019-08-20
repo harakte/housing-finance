@@ -2,10 +2,7 @@ package com.kakaopay.finance.service;
 
 import com.kakaopay.finance.dao.FinanceRepository;
 import com.kakaopay.finance.dao.InstituteRepository;
-import com.kakaopay.finance.dto.AnnualAverageAmount;
-import com.kakaopay.finance.dto.AnnualInstituteFinance;
-import com.kakaopay.finance.dto.InstituteSupportFinance;
-import com.kakaopay.finance.dto.YearFinance;
+import com.kakaopay.finance.dto.*;
 import com.kakaopay.finance.entity.Finance;
 import com.kakaopay.finance.entity.Institute;
 import com.kakaopay.finance.exception.InstituteNotFoundException;
@@ -189,5 +186,8 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
         }
     }
 
-
+    @Override
+    public PredictFinance predict(String instituteName, int month) {
+        return null;
+    }
 }

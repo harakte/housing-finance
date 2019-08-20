@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InstituteRepository extends JpaRepository<Institute, String> {
+    Institute findByInstituteName(String instituteName);
 }

@@ -8,12 +8,18 @@ import com.kakaopay.finance.dto.InstituteSupportFinance;
 import com.kakaopay.finance.dto.YearFinance;
 import com.kakaopay.finance.entity.Finance;
 import com.kakaopay.finance.entity.Institute;
+import com.kakaopay.finance.exception.InstituteNotFoundException;
+import com.kakaopay.finance.exception.NoDataException;
 import com.kakaopay.finance.util.CsvUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,43 +38,59 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
 
     @Override
     public boolean upload() {
-        try{
-            List<String[]> list = CsvUtil.readCsvFile(filePath);
-            String[] headerList = list.remove(0);
-            List<Institute> institutes = new ArrayList<>();
-            for(int i = 2; i<headerList.length; i++){
-                if(headerList[i].trim().length() != 0){
-                    institutes.add(new Institute(headerList[i].split("[]()]")[0]));
-                }
-            }
 
-            List<Finance> finances = new ArrayList<>();
-            for(String[] dataRow : list){
-                List<String> dataList = new ArrayList(Arrays.asList(dataRow));
-                Integer year = Integer.parseInt(dataList.remove(0));
-                Integer month = Integer.parseInt(dataList.remove(0));
-                for(int i = 0 ; i < dataList.size(); i++){
-                    if(dataList.get(i).trim().length() != 0) {
-                        Finance finance = new Finance(institutes.get(i), year, month,
-                                Integer.parseInt(dataList.get(i).replaceAll("[,\"]","")));
-                        institutes.get(i).addFinance(finance);
-                        finances.add(finance);
-                    }
-                }
-            }
-
-            instituteRepository.saveAll(institutes);
-            financeRepository.saveAll(finances);
-            return true;
-        }catch (Exception ex){
-            log.error("Error = {}", ex.getMessage());
-            return false;
+        List<String[]> list;
+        try {
+            list = CsvUtil.readCsvFile(filePath);
+        }catch (IOException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Csv file read failed.", ex);
+        }catch (URISyntaxException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Not correct csv file path.", ex);
         }
+
+        if(list == null || list.size() < 1){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No data in csv file.");
+        }
+
+        String[] headerList = list.remove(0);
+        List<Institute> institutes = new ArrayList<>();
+        for(int i = 2; i<headerList.length; i++){
+            if(headerList[i].trim().length() != 0){
+                institutes.add(new Institute(headerList[i].split("[]()]")[0]));
+            }
+        }
+
+        List<Finance> finances = new ArrayList<>();
+        for(String[] dataRow : list){
+            List<String> dataList = new ArrayList(Arrays.asList(dataRow));
+            Integer year = Integer.parseInt(dataList.remove(0));
+            Integer month = Integer.parseInt(dataList.remove(0));
+            for(int i = 0 ; i < dataList.size(); i++){
+                if(dataList.get(i).trim().length() != 0) {
+                    Finance finance = new Finance(institutes.get(i), year, month,
+                            Integer.parseInt(dataList.get(i).replaceAll("[,\"]","")));
+                    institutes.get(i).addFinance(finance);
+                    finances.add(finance);
+                }
+            }
+        }
+
+        instituteRepository.saveAll(institutes);
+        return true;
     }
 
     @Override
     public List<Institute> findAll() {
-        return instituteRepository.findAll();
+        try {
+            List<Institute> institutes = instituteRepository.findAll();
+
+            if(institutes.size() < 1)
+                throw new NoDataException("No institute data in Repository");
+
+            return institutes;
+        }catch (NoDataException ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        }
     }
 
     @Override
@@ -96,7 +118,7 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
     }
 
     @Override
-    public AnnualInstituteFinance getLargestAnnualFinance() {
+    public AnnualInstituteFinance getLargestAnnualFinance(){
         /*
         1. 전체 institute 조회
         2. Map<String, Map<Integer,Integer>> 형태로 은행의 년도별 총합 grouping: Map<instituteName, Map<year, amount>>
@@ -104,62 +126,67 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
         4. 은행별 가장 큰 년도 총합 중 가장 큰 값을 검색: Map.Entry<instituteName, Map.Entry<year, amount>>
         5. AnnualInstituteFinance class 형태로 리턴
          */
-        return instituteRepository.findAll().stream()
-                .collect(
-                        Collectors.toMap(
-                                Institute::getInstituteName,
-                                institute -> institute.getFinances().stream()
-                                        .collect(
-                                                Collectors.groupingBy(
-                                                        Finance::getYear,
-                                                        Collectors.summingInt(Finance::getAmount)))
-                                        .entrySet().stream()
-                                        .max(Comparator.comparing(Map.Entry::getValue))
-                                        .orElseThrow(NoSuchElementException::new)))
-                .entrySet().stream()
-                .max(Comparator.comparing(entry -> entry.getValue().getValue()))
-                .map(largest -> new AnnualInstituteFinance(
-                        largest.getKey(),
-                        largest.getValue().getKey(),
-                        largest.getValue().getValue()))
-                .orElseThrow(NoSuchElementException::new);
+        try {
+            return instituteRepository.findAll().stream()
+                    .collect(
+                            Collectors.toMap(
+                                    Institute::getInstituteName,
+                                    institute -> institute.getFinances().stream()
+                                            .collect(
+                                                    Collectors.groupingBy(
+                                                            Finance::getYear,
+                                                            Collectors.summingInt(Finance::getAmount)))
+                                            .entrySet().stream()
+                                            .max(Comparator.comparing(Map.Entry::getValue))
+                                            .orElse(new AbstractMap.SimpleEntry<Integer, Integer>(0, 0))))
+                    .entrySet().stream()
+                    .max(Comparator.comparing(entry -> entry.getValue().getValue()))
+                    .map(largest -> new AnnualInstituteFinance(
+                            largest.getKey(),
+                            largest.getValue().getKey(),
+                            largest.getValue().getValue()))
+                    .orElseThrow(() -> new NoDataException("No institute data in Repository"));
+        }catch(NoDataException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
+        }
     }
 
     @Override
     public InstituteSupportFinance getInstituteSummary(String instituteCode) {
         /*
         1. id인 instituteCode로 institute 조회
-        2. Map<Integer,Integer> 형태로 은행의 년도별 평균 금액: Map<year, amount>
-        3. 은행의 년도별 평균 금액 중 최대값을 AnnualAverageAmount class로 변환하여 list에 추가
-        4. 은행의 년도별 평균 금액 중 최소값을 AnnualAverageAmount class로 변환하여 list에 추가
+        2. List<AnnualAverageAmount> 형태로 은행의 년도별 평균 금액
+        3. List<AnnualAverageAmount>를 amount 기준으로 정렬
+        4. 은행의 년도별 평균 금액 중 최대값과 최소값을 추출
         5. InstituteSupportFinance class 형태로 리턴
         */
-        Institute institute = instituteRepository.findById(instituteCode).orElseThrow(NoSuchElementException::new);
+        try {
+            Institute institute = instituteRepository.findById(instituteCode)
+                    .orElseThrow(() -> new InstituteNotFoundException("Provide correct institute code"));
 
-        Map<Integer, Integer> instituteAverageFinance =
-                institute.getFinances().stream()
-                        .collect(
-                                Collectors.groupingBy(
-                                        Finance::getYear,
-                                        Collectors.averagingInt(Finance::getAmount)))
-                        .entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, e -> (int)Math.ceil(e.getValue())));
+            List<AnnualAverageAmount> averageAmounts =
+                    institute.getFinances().stream()
+                            .collect(
+                                    Collectors.groupingBy(
+                                            Finance::getYear,
+                                            Collectors.averagingInt(Finance::getAmount)))
+                            .entrySet().stream()
+                            .map(e -> new AnnualAverageAmount(e.getKey(), (int) Math.ceil(e.getValue())))
+                            .sorted(Comparator.comparing(AnnualAverageAmount::getAmount))
+                            .collect(Collectors.toList());
 
-        List<AnnualAverageAmount> supportAmount = new ArrayList<>();
+            int size = averageAmounts.size();
+            if (size < 1) throw new NoDataException("No finance data in Repository");
 
-        supportAmount.add(
-                instituteAverageFinance.entrySet().stream()
-                        .max(Comparator.comparing(Map.Entry::getValue))
-                        .map(e -> new AnnualAverageAmount(e.getKey(), e.getValue()))
-                        .orElseThrow(NoSuchElementException::new));
+            return new InstituteSupportFinance(
+                    institute.getInstituteName(),
+                    Arrays.asList(averageAmounts.get(0), averageAmounts.get(size - 1)));
 
-        supportAmount.add(
-                instituteAverageFinance.entrySet().stream()
-                        .min(Comparator.comparing(Map.Entry::getValue))
-                        .map(e -> new AnnualAverageAmount(e.getKey(), e.getValue()))
-                        .orElseThrow(NoSuchElementException::new));
-
-        return new InstituteSupportFinance(institute.getInstituteName(), supportAmount);
+        }catch(InstituteNotFoundException ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        }catch (NoDataException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
+        }
     }
 
 

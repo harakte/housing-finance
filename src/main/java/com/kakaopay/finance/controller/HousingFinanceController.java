@@ -6,7 +6,10 @@ import com.kakaopay.finance.dto.YearFinance;
 import com.kakaopay.finance.entity.Institute;
 import com.kakaopay.finance.service.HousingFinanceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -21,8 +24,8 @@ public class HousingFinanceController {
         return service.upload();
     }
 
-    @GetMapping("/get")
-    public List<Institute> findAll(){
+    @GetMapping("/banks")
+    public List<Institute> findAllBanks(){
         return service.findAll();
     }
 

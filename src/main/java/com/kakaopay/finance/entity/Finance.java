@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -26,10 +28,13 @@ public class Finance {
 
     @Id
     @NotNull
+    @Min(0)
     private Integer year;
 
     @Id
     @NotNull
+    @Min(1)
+    @Max(12)
     private Integer month;
 
     @NotNull

@@ -8,7 +8,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +25,7 @@ public class Institute {
             strategy = "com.kakaopay.finance.config.StringIdentifierGenerator")
     private String instituteCode;
 
-    @NotNull
+    @NotEmpty
     private String instituteName;
 
     @OneToMany(mappedBy = "institute", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -38,7 +38,7 @@ public class Institute {
 
     public void addFinance(Finance finance){
         if(finances == null){
-            finances = new HashSet<Finance>();
+            finances = new HashSet<>();
         }
         finances.add(finance);
     }

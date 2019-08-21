@@ -2,10 +2,7 @@ package com.kakaopay.finance.service;
 
 import com.kakaopay.finance.dao.FinanceRepository;
 import com.kakaopay.finance.dao.InstituteRepository;
-import com.kakaopay.finance.dto.AnnualAverageAmount;
-import com.kakaopay.finance.dto.AnnualInstituteFinance;
-import com.kakaopay.finance.dto.InstituteSupportFinance;
-import com.kakaopay.finance.dto.YearFinance;
+import com.kakaopay.finance.dto.*;
 import com.kakaopay.finance.entity.Finance;
 import com.kakaopay.finance.entity.Institute;
 import org.junit.Before;
@@ -79,7 +76,7 @@ public class HousingFinanceImplTest {
 
     @Test
     public void testFindAll(){
-        List<Institute> institutes = housingFinanceService.findAll();
+        List<Institute> institutes = housingFinanceService.getAllInstitutes();
 
         assertThat(institutes)
                 .isNotEmpty()
@@ -124,8 +121,8 @@ public class HousingFinanceImplTest {
     @Test
     public void testGetInstituteSummary() {
         List<AnnualAverageAmount> amounts = new ArrayList<>();
-        amounts.add(new AnnualAverageAmount(2020, 102));
         amounts.add(new AnnualAverageAmount(2019, 101));
+        amounts.add(new AnnualAverageAmount(2020, 102));
         InstituteSupportFinance check = new InstituteSupportFinance("Bank A", amounts);
 
         InstituteSupportFinance finance = housingFinanceService.getInstituteSummary("bnk-1");
@@ -133,5 +130,33 @@ public class HousingFinanceImplTest {
         assertThat(finance)
                 .isNotNull()
                 .isEqualToComparingFieldByFieldRecursively(check);
+    }
+
+    @Test
+    public void testPredict() {
+        String instituteName = "Bank A";
+        Institute bankA = new Institute(instituteName);
+        Finance financeA1 = new Finance(bankA, 2015, 1, 846);
+        Finance financeA2 = new Finance(bankA, 2016, 1, 534);
+        Finance financeA3 = new Finance(bankA, 2017, 1, 282);
+        Finance financeA4 = new Finance(bankA, 2018, 1, 1832);
+        Finance financeA5 = new Finance(bankA, 2019, 1, 383);
+        Finance financeA6 = new Finance(bankA, 2020, 1, 1779);
+        bankA.addFinance(financeA1);
+        bankA.addFinance(financeA2);
+        bankA.addFinance(financeA3);
+        bankA.addFinance(financeA4);
+        bankA.addFinance(financeA5);
+        bankA.addFinance(financeA6);
+
+        Mockito.when(instituteRepository.findByInstituteName(instituteName)).thenReturn(Optional.of(bankA));
+
+        int predictMonth = 1;
+        PredictFinance predictFinance = housingFinanceService.predict("Bank A", predictMonth);
+
+        assertThat(predictFinance.getYear())
+                .isEqualTo(2021);
+        assertThat(predictFinance.getMonth().intValue())
+                .isEqualTo(predictMonth);
     }
 }

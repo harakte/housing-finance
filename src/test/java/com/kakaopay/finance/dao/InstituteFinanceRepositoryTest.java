@@ -3,10 +3,9 @@ package com.kakaopay.finance.dao;
 import com.kakaopay.finance.entity.Finance;
 import com.kakaopay.finance.entity.Institute;
 import com.kakaopay.finance.entity.id.FinanceId;
+import com.kakaopay.finance.exception.InstituteNotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -79,9 +78,20 @@ public class InstituteFinanceRepositoryTest {
 
         FinanceId financeId = new FinanceId(2019, 1, bankA.getInstituteCode());
         Finance finance = financeRepository.findById(financeId).orElseThrow(NoSuchElementException::new);
+
         assertThat(finance.getInstitute())
                 .isNotNull()
                 .isEqualToComparingFieldByFieldRecursively(bankA);
 
+        try {
+            Institute findByNameInstitute = instituteRepository.findByInstituteName("Bank A")
+                    .orElseThrow(() -> new InstituteNotFoundException("Not fount Bank A"));
+
+            assertThat(findByNameInstitute)
+                    .isNotNull()
+                    .isEqualToComparingFieldByFieldRecursively(bankA);
+        }catch (InstituteNotFoundException ex){
+
+        }
     }
 }

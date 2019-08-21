@@ -30,8 +30,14 @@
 
 ## 개발 프레임워크
 - 개발 언어: Java
-- 개발 프레임워크: spring boot
+- 개발 프레임워크: Spring boot
 - Dependency
+  - org.springframework.boot:spring-boot-starter-web
+  - org.springframework.boot:spring-boot-starter-data-jpa
+  - com.h2database:h2
+  - com.opencsv:opencsv
+  - org.projectlombok:lombok
+  - org.springframework.boot:spring-boot-starter-test
 
 ## 문제해결 전략
 - Entity 관계
@@ -71,19 +77,24 @@
 
 ## 빌드 및 실행 방법
 
+빌드
+<pre><code>./gradlew build</code></pre>
+
+실행
+<pre><code>java -jar .\build\libs\housing-finance-1.0.0.jar</code></pre>
 
 ## 테이블 스키마
 ![Alt text](https://github.com/Khafre-SungMin-Cho/housing-finance/blob/master/Untitled%20Diagram.png)
 
 ### Institute (기관)
-- institute_code: varchar
-- institute_name: nvarchar
+- institute_code: String
+- institute_name: String
 
 ### Finance (금융 데이터)
-- institute_code: varchar
-- year: int
-- month: int
-- amount: int
+- institute_code: String
+- year: Integer
+- month: Integer
+- amount: Integer
 
 ## API 명세서
 ### POST /upload
@@ -93,12 +104,12 @@
   - 없음
 
 - Response
+  - result: boolean, 데이터 파일 저장의 성공 여부
 
 응답 예시
-<pre><code> true
-</code></pre>
-  
-- Response Code
+<pre><code>{
+  "result":true
+}</code></pre>
 
 ### GET /banks
 주택금융 공급 금융기관(은행) 목록을 출력하는 API
@@ -107,6 +118,8 @@
   - 없음
 
 - Response
+  - instituteCode: String, 기관 코드
+  - instituteName: String, 기관명
 
 응답 예시
 <pre><code>[
@@ -129,7 +142,10 @@
   - 없음
 
 - Response
-
+  - year: Integer, 년도
+  - totalAmount: Integer, 년도의 총 지원금액(억원)
+  - detailAmount: <String, Integer>, <기관명, 지원금액(억원)>
+  
 응답 예시
 <pre><code>[
   {
@@ -173,10 +189,12 @@
   - 없음
 
 - Response
+  - instituteName: String, 기관명
+  - year: Integer, 년도
 
 응답 예시
 <pre><code>{
-  "instituteName": "주택도시기금1",
+  "instituteName": "주택도시기금",
   "year": 2014
 } 
 </code></pre>
@@ -188,6 +206,10 @@
   - bankCode: institute code, string, 외환은행 기관코드 입력(bnk-8)
 
 - Response
+  - instituteName: String, 기관명
+  - supportAmount: 년도별 평균 지원금액 최소값, 최대값
+    - year: Integer, 년도
+    - amount: Integer, 년도 평균 지원금액
 
 응답 예시
 <pre><code>{
@@ -204,10 +226,30 @@
 특정 은행의 특정 달에 대해서 2018 년도 해당 달에 금융지원 금액을 예측하는 API
 - 단, 예측 알고리즘을 무엇을 써야하는지에 대한 제약은 없지만, 가장 근사치에 가까울 수록 높은 점수 부여.
 
+POST /predict
+
+- Request
+<pre><code>{
+	"instituteName":"국민은행",
+	"month":2
+}</code></pre>
+
+- Response
+  - instituteCode: 기관 코드
+  - year: Integer, 년도
+  - month: Integer, 달
+  - amount: Integer, 예측 지원금액
+<pre><code>{
+    "instituteCode": "bnk-2",
+    "year": 2018,
+    "month": 2,
+    "amount": 4880
+}</code></pre>
+
 ## TO DO
 - [X] README 정리
 - [X] 테이블 스키마 설계
-- [ ] API 명세서 작성
+- [X] API 명세서 작성
   - [X] request 작성
   - [X] response 작성
   - [X] response 예시
@@ -219,10 +261,10 @@
   - [X] Entity 구성
 - [X] 데이터 읽어오기
 - [X] Identifier generator 생성 및 적용
-- [ ] 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API
+- [X] 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API
   - [X] Happy case만 고려된 동작 개발
-  - [ ] 예외처리 작업
-- [ ] 주택금융 공급 금융기관(은행) 목록을 출력하는 API
+  - [X] 예외처리 작업
+- [X] 주택금융 공급 금융기관(은행) 목록을 출력하는 API
   - [X] Happy case만 고려된 동작 개발
   - [X] 예외처리 작업 
 - [X] 년도별 각 금융기관의 지원금액 합계를 출력하는 API
@@ -234,8 +276,8 @@
 - [X] 전체 년도에서 외환은행의 지원금액 평균 중에서 가장 작은 금액과 큰 금액을 출력하는 API
   - [X] Happy case만 고려된 동작 개발
   - [X] 예외처리 
-- [ ] 응답 처리
-  - [ ] 결과 응답 처리
+- [X] 응답 처리
+  - [X] 결과 응답 처리
   - [X] 예외 응답 처리
 
 ## OPTION
@@ -243,7 +285,7 @@
   - [ ] signup 계정 생성 API
   - [ ] signin 로그인 API
   - [ ] refresh 토큰 재발급 API
-- [ ] 특정 은행의 특정 달에 대해서 2018 년도 해당 달에 금융지원 금액을 예측하는 API
+- [X] 특정 은행의 특정 달에 대해서 2018 년도 해당 달에 금융지원 금액을 예측하는 API
   - [X] 예측 알고리즘 선정
   - [X] 예측 알고리즘 구현
   - [ ] 예외 처리

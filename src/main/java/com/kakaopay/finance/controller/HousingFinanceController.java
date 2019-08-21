@@ -1,16 +1,12 @@
 package com.kakaopay.finance.controller;
 
-import com.kakaopay.finance.dto.AnnualInstituteFinance;
-import com.kakaopay.finance.dto.InstituteSupportFinance;
-import com.kakaopay.finance.dto.YearFinance;
+import com.kakaopay.finance.dto.*;
 import com.kakaopay.finance.entity.Institute;
 import com.kakaopay.finance.service.HousingFinanceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,7 +22,7 @@ public class HousingFinanceController {
 
     @GetMapping("/banks")
     public List<Institute> findAllBanks(){
-        return service.findAll();
+        return service.getAllInstitutes();
     }
 
     @GetMapping("/years")
@@ -42,6 +38,11 @@ public class HousingFinanceController {
     @GetMapping("/summary/{instituteCode}")
     public InstituteSupportFinance getInstituteSummary(@PathVariable String instituteCode){
         return service.getInstituteSummary(instituteCode);
+    }
+
+    @PostMapping("/predict")
+    public PredictFinance predictFinance(@Valid @RequestBody PredictFinanceDto dto){
+        return service.predict(dto.getInstituteName(), dto.getMonth());
     }
 
 }

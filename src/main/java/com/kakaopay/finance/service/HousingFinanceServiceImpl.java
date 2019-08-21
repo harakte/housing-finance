@@ -8,6 +8,7 @@ import com.kakaopay.finance.entity.Institute;
 import com.kakaopay.finance.exception.InstituteNotFoundException;
 import com.kakaopay.finance.exception.NoDataException;
 import com.kakaopay.finance.util.CsvUtil;
+import com.kakaopay.finance.util.LinearRegression;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,7 +78,7 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
     }
 
     @Override
-    public List<Institute> findAll() {
+    public List<Institute> getAllInstitutes() {
         try {
             List<Institute> institutes = instituteRepository.findAll();
 
@@ -188,6 +189,38 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
 
     @Override
     public PredictFinance predict(String instituteName, int month) {
-        return null;
+        // 기관 이름을 기준으로 조회
+        Institute institute;
+        try {
+            institute = instituteRepository.findByInstituteName(instituteName).orElseThrow(() -> new InstituteNotFoundException("Not found " + instituteName));
+        } catch (InstituteNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        }
+
+        // Map<Integer, Integer> 형태로 finance 데이터를 mapping : Map<x, y>
+        Map<Integer, Integer> monthAmounts =
+        institute.getFinances().stream()
+                .collect(Collectors.toMap(
+                        finance -> finance.getYear() * 12 + finance.getMonth(),
+                        Finance::getAmount));
+
+        // 예측 변수
+        List<Integer> months = monthAmounts.keySet().stream()
+                .mapToInt(integer -> integer)
+                .boxed().collect(Collectors.toList());
+        // 결과 변수
+        List<Integer> amounts = monthAmounts.values().stream()
+                .mapToInt(integer -> integer).boxed()
+                .collect(Collectors.toList());
+
+        // Linear regression 초기화
+        LinearRegression linearRegression = new LinearRegression(months, amounts);
+        // 예측해야하는 다음 년도
+        int predictYear = institute.getFinances().stream().mapToInt(Finance::getYear).max().orElse(0) + 1;
+        int predictX = predictYear * 12 + month;
+
+        // 예측 계산
+        Integer predictAmount = linearRegression.predict(predictX).intValue();
+        return new PredictFinance(institute.getInstituteCode(), predictYear, month, predictAmount);
     }
 }

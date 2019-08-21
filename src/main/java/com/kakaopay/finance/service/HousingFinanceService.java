@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface HousingFinanceService {
     boolean upload();
-    List<Institute> findAll();
+    List<Institute> getAllInstitutes();
     List<YearFinance> getYearFinances();
     AnnualInstituteFinance getLargestAnnualFinance();
     InstituteSupportFinance getInstituteSummary(String instituteCode);

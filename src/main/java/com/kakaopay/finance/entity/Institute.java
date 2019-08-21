@@ -9,6 +9,7 @@ import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +26,7 @@ public class Institute {
             strategy = "com.kakaopay.finance.config.StringIdentifierGenerator")
     private String instituteCode;
 
+    @NotNull
     @NotEmpty
     private String instituteName;
 

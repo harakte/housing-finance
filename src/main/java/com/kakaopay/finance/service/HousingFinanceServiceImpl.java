@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,15 +34,12 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
     private String filePath;
 
     @Override
-    public boolean upload() {
-
+    public Result upload() {
         List<String[]> list;
         try {
             list = CsvUtil.readCsvFile(filePath);
         }catch (IOException ex) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Csv file read failed.", ex);
-        }catch (URISyntaxException ex){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Not correct csv file path.", ex);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
         }
 
         if(list == null || list.size() < 1){
@@ -54,7 +50,7 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
         List<Institute> institutes = new ArrayList<>();
         for(int i = 2; i<headerList.length; i++){
             if(headerList[i].trim().length() != 0){
-                institutes.add(new Institute(headerList[i].split("[]()]")[0]));
+                institutes.add(new Institute(headerList[i].split("[1-9()]")[0]));
             }
         }
 
@@ -73,8 +69,12 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
             }
         }
 
-        instituteRepository.saveAll(institutes);
-        return true;
+        List<Institute> saveInstitutes = instituteRepository.saveAll(institutes);
+        if(saveInstitutes.size() < 1){
+            return new Result(Boolean.FALSE, "No data inserted in database.");
+        }
+
+        return new Result(Boolean.TRUE);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
 
             return institutes;
         }catch (NoDataException ex){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
         }
     }
 

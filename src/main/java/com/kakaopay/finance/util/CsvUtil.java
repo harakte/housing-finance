@@ -1,22 +1,25 @@
 package com.kakaopay.finance.util;
 
 import com.opencsv.CSVReader;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
+
+@Slf4j
 public class CsvUtil {
 
-    public static List<String[]> readCsvFile(String filePath) throws URISyntaxException, IOException {
-        Reader reader = Files.newBufferedReader(Paths.get(ClassLoader.getSystemResource(filePath).toURI()), Charset.forName("x-windows-949"));
-        CSVReader csvReader = new CSVReader(reader);
+    public static List<String[]> readCsvFile(String filePath) throws IOException{
+        InputStream input = ClassLoader.getSystemResourceAsStream(filePath);
+        if(input == null){
+            input = CsvUtil.class.getResourceAsStream("/"+filePath);
+        }
+        CSVReader csvReader = new CSVReader(new InputStreamReader(input));
         List<String[]> list = csvReader.readAll();
-        reader.close();
+        input.close();
         csvReader.close();
         return list;
     }

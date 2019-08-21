@@ -15,10 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,8 +36,8 @@ public class HousingFinanceControllerTest {
 
     @Test
     public void testUpload() throws Exception{
-
-        given(housingFinanceService.upload()).willReturn(Boolean.TRUE);
+        Result result = new Result(Boolean.TRUE);
+        given(housingFinanceService.upload()).willReturn(result);
 
         mvc.perform(post("/upload").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -76,7 +73,7 @@ public class HousingFinanceControllerTest {
                 new AbstractMap.SimpleEntry<>("Bank B", 1001)
         ).collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
         YearFinance yearFinance = new YearFinance(2019, 8, detailAmounts);
-        List<YearFinance> yearFinances = Arrays.asList(yearFinance);
+        List<YearFinance> yearFinances = Collections.singletonList(yearFinance);
 
         given(housingFinanceService.getYearFinances()).willReturn(yearFinances);
 

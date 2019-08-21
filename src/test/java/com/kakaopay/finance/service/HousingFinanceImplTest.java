@@ -32,7 +32,7 @@ public class HousingFinanceImplTest {
     }
 
     @Autowired
-    private HousingFinanceService housingFinanceService;
+    private HousingFinanceServiceImpl housingFinanceServiceImpl;
 
     @MockBean
     private InstituteRepository instituteRepository;
@@ -42,7 +42,7 @@ public class HousingFinanceImplTest {
 
     @Before
     public void setUp(){
-        ReflectionTestUtils.setField(housingFinanceService, "filePath", "csv/input.csv");
+        ReflectionTestUtils.setField(housingFinanceServiceImpl, "filePath", "csv/input.csv");
 
         Institute bankA = new Institute("Bank A");
         Finance financeA1 = new Finance(bankA, 2019, 1, 100);
@@ -68,15 +68,15 @@ public class HousingFinanceImplTest {
 
     @Test
     public void testUpload(){
-        boolean result = housingFinanceService.upload();
+        Result result = housingFinanceServiceImpl.upload();
 
         assertThat(result)
-                .isTrue();
+                .isNotNull();
     }
 
     @Test
     public void testFindAll(){
-        List<Institute> institutes = housingFinanceService.getAllInstitutes();
+        List<Institute> institutes = housingFinanceServiceImpl.getAllInstitutes();
 
         assertThat(institutes)
                 .isNotEmpty()
@@ -94,7 +94,7 @@ public class HousingFinanceImplTest {
         detailAmount.put("Bank B", 401);
         YearFinance check = new YearFinance(2019, 602, detailAmount);
 
-        List<YearFinance> yearFinances = housingFinanceService.getYearFinances();
+        List<YearFinance> yearFinances = housingFinanceServiceImpl.getYearFinances();
 
         assertThat(yearFinances)
                 .isNotEmpty()
@@ -111,7 +111,7 @@ public class HousingFinanceImplTest {
     public void testGetLargestAnnualFinance(){
         AnnualInstituteFinance check = new AnnualInstituteFinance("Bank B", 2019, 401);
 
-        AnnualInstituteFinance finance = housingFinanceService.getLargestAnnualFinance();
+        AnnualInstituteFinance finance = housingFinanceServiceImpl.getLargestAnnualFinance();
 
         assertThat(finance)
                 .isNotNull()
@@ -125,7 +125,7 @@ public class HousingFinanceImplTest {
         amounts.add(new AnnualAverageAmount(2020, 102));
         InstituteSupportFinance check = new InstituteSupportFinance("Bank A", amounts);
 
-        InstituteSupportFinance finance = housingFinanceService.getInstituteSummary("bnk-1");
+        InstituteSupportFinance finance = housingFinanceServiceImpl.getInstituteSummary("bnk-1");
 
         assertThat(finance)
                 .isNotNull()
@@ -152,7 +152,7 @@ public class HousingFinanceImplTest {
         Mockito.when(instituteRepository.findByInstituteName(instituteName)).thenReturn(Optional.of(bankA));
 
         int predictMonth = 1;
-        PredictFinance predictFinance = housingFinanceService.predict("Bank A", predictMonth);
+        PredictFinance predictFinance = housingFinanceServiceImpl.predict("Bank A", predictMonth);
 
         assertThat(predictFinance.getYear())
                 .isEqualTo(2021);

@@ -16,7 +16,7 @@ public class HousingFinanceController {
     HousingFinanceService service;
 
     @PostMapping("/upload")
-    public boolean upload(){
+    public Result upload(){
         return service.upload();
     }
 

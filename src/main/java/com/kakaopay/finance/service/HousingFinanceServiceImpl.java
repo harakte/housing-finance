@@ -169,7 +169,7 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
                                             Finance::getYear,
                                             Collectors.averagingInt(Finance::getAmount)))
                             .entrySet().stream()
-                            .map(e -> new AnnualAverageAmount(e.getKey(), (int) Math.ceil(e.getValue())))
+                            .map(e -> new AnnualAverageAmount(e.getKey(), (int) Math.round(e.getValue())))
                             .sorted(Comparator.comparing(AnnualAverageAmount::getAmount))
                             .collect(Collectors.toList());
 

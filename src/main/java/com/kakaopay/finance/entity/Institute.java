@@ -28,6 +28,7 @@ public class Institute {
 
     @NotNull
     @NotEmpty
+    @Column(unique = true)
     private String instituteName;
 
     @OneToMany(mappedBy = "institute", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

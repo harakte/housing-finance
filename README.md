@@ -68,7 +68,6 @@
 csv 파일 위치
 csv/input.csv
 
-다운로드
 jar 다운로드: [jar 다운로드](https://github.com/Khafre-SungMin-Cho/housing-finance/raw/master/libs/housing-finance-1.0.0.jar)
 
 빌드

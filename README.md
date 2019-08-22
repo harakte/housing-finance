@@ -69,7 +69,7 @@ csv 파일 위치
 csv/input.csv
 
 다운로드
-jar 다운로드: 
+jar 다운로드: [jar 다운로드](https://github.com/Khafre-SungMin-Cho/housing-finance/raw/master/libs/housing-finance-1.0.0.jar)
 
 빌드
 <pre><code>./gradlew build</code></pre>
@@ -95,7 +95,9 @@ jar 다운로드:
 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API
 
 - Request
-  - 없음
+  - http://localhost:8080/upload
+  - body parameter
+  	- 없음
 
 - Response
   - result: boolean, 데이터 파일 저장의 성공 여부
@@ -109,8 +111,9 @@ jar 다운로드:
 주택금융 공급 금융기관(은행) 목록을 출력하는 API
 
 - Request
-  - 없음
-
+  - http://localhost:8080/banks
+  - body parameter
+  	- 없음
 - Response
   - instituteCode: String, 기관 코드
   - instituteName: String, 기관명
@@ -133,8 +136,10 @@ jar 다운로드:
 년도별 각 금융기관의 지원금액 합계를 출력하는 API
 
 - Request
-  - 없음
-
+  - http://localhost:8080/years
+  - body parameter
+  	- 없음
+	
 - Response
   - year: Integer, 년도
   - totalAmount: Integer, 년도의 총 지원금액(억원)
@@ -180,7 +185,9 @@ jar 다운로드:
 각 년도별 각 기관의 전체 지원금액 중에서 가장 큰 금액의 기관명을 출력하는 API
 
 - Request
-  - 없음
+  - http://localhost:8080/largest
+  - body parameter
+    - 없음
 
 - Response
   - instituteName: String, 기관명
@@ -197,7 +204,9 @@ jar 다운로드:
 전체 년도(2005~2016)에서 외환은행의 지원금액 평균 중에서 가장 작은 금액과 큰 금액을 출력하는 API
 
 - Request
-  - bankCode: institute code, string, 외환은행 기관코드 입력(bnk-8)
+  - http://localhost:8080/summary/bnk-8
+  - path parameter
+    - bankCode: String, 외환은행 기관코드(institute code) 입력(bnk-8)
 
 - Response
   - instituteName: String, 기관명
@@ -223,6 +232,11 @@ jar 다운로드:
 POST /predict
 
 - Request
+  - http://localhost:8080/predict
+  - content-type: application/json
+  - body parameter
+    - instituteName: String, 기관명
+    - month: Integer, 예측 달
 <pre><code>{
 	"instituteName":"국민은행",
 	"month":2

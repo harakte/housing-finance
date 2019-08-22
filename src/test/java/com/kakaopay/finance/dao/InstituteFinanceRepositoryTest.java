@@ -3,7 +3,7 @@ package com.kakaopay.finance.dao;
 import com.kakaopay.finance.entity.Finance;
 import com.kakaopay.finance.entity.Institute;
 import com.kakaopay.finance.entity.id.FinanceId;
-import com.kakaopay.finance.exception.InstituteNotFoundException;
+import com.kakaopay.finance.exception.NotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,12 +85,12 @@ public class InstituteFinanceRepositoryTest {
 
         try {
             Institute findByNameInstitute = instituteRepository.findByInstituteName("Bank A")
-                    .orElseThrow(() -> new InstituteNotFoundException("Not fount Bank A"));
+                    .orElseThrow(() -> new NotFoundException("Not fount Bank A"));
 
             assertThat(findByNameInstitute)
                     .isNotNull()
                     .isEqualToComparingFieldByFieldRecursively(bankA);
-        }catch (InstituteNotFoundException ex){
+        }catch (NotFoundException ex){
 
         }
     }

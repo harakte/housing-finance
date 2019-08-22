@@ -5,7 +5,7 @@ import com.kakaopay.finance.dao.InstituteRepository;
 import com.kakaopay.finance.dto.*;
 import com.kakaopay.finance.entity.Finance;
 import com.kakaopay.finance.entity.Institute;
-import com.kakaopay.finance.exception.InstituteNotFoundException;
+import com.kakaopay.finance.exception.NotFoundException;
 import com.kakaopay.finance.exception.NoDataException;
 import com.kakaopay.finance.util.CsvUtil;
 import com.kakaopay.finance.util.LinearRegression;
@@ -125,25 +125,29 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
         5. AnnualInstituteFinance class 형태로 리턴
          */
         try {
-            return instituteRepository.findAll().stream()
-                    .collect(
-                            Collectors.toMap(
-                                    Institute::getInstituteName,
-                                    institute -> institute.getFinances().stream()
-                                            .collect(
-                                                    Collectors.groupingBy(
-                                                            Finance::getYear,
-                                                            Collectors.summingInt(Finance::getAmount)))
-                                            .entrySet().stream()
-                                            .max(Comparator.comparing(Map.Entry::getValue))
-                                            .orElse(new AbstractMap.SimpleEntry<Integer, Integer>(0, 0))))
-                    .entrySet().stream()
+            //각 기관별 가장 큰 금액의 년도와 금액
+            Map<String, Map.Entry<Integer, Integer>> largestInInstitute =
+                    instituteRepository.findAll().stream()
+                            .collect(
+                                    Collectors.toMap(
+                                            Institute::getInstituteName,
+                                            institute -> institute.getFinances().stream()
+                                                    .collect(
+                                                            Collectors.groupingBy(
+                                                                    Finance::getYear,
+                                                                    Collectors.summingInt(Finance::getAmount)))
+                                                    .entrySet().stream()
+                                                    .max(Comparator.comparing(Map.Entry::getValue))
+                                                    .orElse(new AbstractMap.SimpleEntry<Integer, Integer>(0, 0))));
+            //가장 큰 금액의 기관
+            return largestInInstitute.entrySet().stream()
                     .max(Comparator.comparing(entry -> entry.getValue().getValue()))
                     .map(largest -> new AnnualInstituteFinance(
                             largest.getKey(),
                             largest.getValue().getKey(),
                             largest.getValue().getValue()))
                     .orElseThrow(() -> new NoDataException("No institute data in Repository"));
+
         }catch(NoDataException ex){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
         }
@@ -160,7 +164,7 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
         */
         try {
             Institute institute = instituteRepository.findById(instituteCode)
-                    .orElseThrow(() -> new InstituteNotFoundException("Provide correct institute code"));
+                    .orElseThrow(() -> new NotFoundException("Provide correct institute code"));
 
             List<AnnualAverageAmount> averageAmounts =
                     institute.getFinances().stream()
@@ -180,7 +184,7 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
                     institute.getInstituteName(),
                     Arrays.asList(averageAmounts.get(0), averageAmounts.get(size - 1)));
 
-        }catch(InstituteNotFoundException ex){
+        }catch(NotFoundException ex){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
         }catch (NoDataException ex){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
@@ -192,8 +196,8 @@ public class HousingFinanceServiceImpl implements HousingFinanceService{
         // 기관 이름을 기준으로 조회
         Institute institute;
         try {
-            institute = instituteRepository.findByInstituteName(instituteName).orElseThrow(() -> new InstituteNotFoundException("Not found " + instituteName));
-        } catch (InstituteNotFoundException ex) {
+            institute = instituteRepository.findByInstituteName(instituteName).orElseThrow(() -> new NotFoundException("Not found " + instituteName));
+        } catch (NotFoundException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
         }
 

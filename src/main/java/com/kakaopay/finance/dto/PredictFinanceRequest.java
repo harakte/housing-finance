@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PredictFinanceDto {
+public class PredictFinanceRequest {
 
     @NotNull
     @NotEmpty

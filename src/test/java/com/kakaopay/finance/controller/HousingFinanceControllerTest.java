@@ -119,7 +119,7 @@ public class HousingFinanceControllerTest {
     @Test
     public void testPredict() throws Exception{
         String instName = "Bank A";
-        PredictFinanceDto request = new PredictFinanceDto(instName, 2);
+        PredictFinanceRequest request = new PredictFinanceRequest(instName, 2);
         PredictFinance predictFinance = new PredictFinance("bnk-1", 2019, 2, 2000);
 
         given(housingFinanceService.predict(request.getInstituteName(), request.getMonth())).willReturn(predictFinance);

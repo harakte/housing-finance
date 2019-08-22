@@ -14,13 +14,11 @@ import javax.validation.constraints.NotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Result {
 
-    @NotNull
-    @NotEmpty
-    private boolean result;
+    private boolean success;
 
     private String message;
 
-    public Result(@NotNull @NotEmpty boolean result) {
-        this.result = result;
+    public Result(boolean success) {
+        this.success = success;
     }
 }

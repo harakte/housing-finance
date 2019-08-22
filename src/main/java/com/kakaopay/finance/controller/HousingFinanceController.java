@@ -41,7 +41,7 @@ public class HousingFinanceController {
     }
 
     @PostMapping("/predict")
-    public PredictFinance predictFinance(@Valid @RequestBody PredictFinanceDto dto){
+    public PredictFinance predictFinance(@Valid @RequestBody PredictFinanceRequest dto){
         return service.predict(dto.getInstituteName(), dto.getMonth());
     }
 

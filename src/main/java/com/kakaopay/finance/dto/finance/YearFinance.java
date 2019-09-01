@@ -1,4 +1,4 @@
-package com.kakaopay.finance.dto;
+package com.kakaopay.finance.dto.finance;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

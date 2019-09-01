@@ -1,8 +1,7 @@
-package com.kakaopay.finance.dto;
+package com.kakaopay.finance.dto.finance;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -11,15 +10,20 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class PredictFinanceRequest {
+public class PredictFinance {
+    @NotEmpty
+    private String instituteCode;
 
     @NotNull
-    @NotEmpty
-    private String instituteName;
+    @Min(0)
+    private Integer year;
 
     @NotNull
     @Min(0)
     @Max(12)
     private Integer month;
+
+    @NotNull
+    @Min(0)
+    private Integer amount;
 }

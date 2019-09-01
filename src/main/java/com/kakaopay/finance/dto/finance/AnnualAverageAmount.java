@@ -1,6 +1,5 @@
-package com.kakaopay.finance.dto;
+package com.kakaopay.finance.dto.finance;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnnualInstituteFinance {
-    private String instituteName;
+public class AnnualAverageAmount {
     private Integer year;
-    @JsonIgnore
     private Integer amount;
 }

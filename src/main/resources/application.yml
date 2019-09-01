@@ -13,3 +13,6 @@ spring:
 csv:
   file:
     path: csv/input.csv
+app:
+  jwtSecret: JWTSuperSecretKey
+  jwtExpirationInMs: 60000
